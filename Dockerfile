@@ -1,22 +1,20 @@
-# Etapa de build
-FROM eclipse-temurin:17-jdk AS builder
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
-COPY mvnw pom.xml ./
-COPY .mvn .mvn
-COPY src src
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-RUN chmod +x mvnw
-RUN ./mvnw -B clean package -DskipTests
+COPY src ./src
 
-# Etapa de execução
-FROM eclipse-temurin:17-jre
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
-
-COPY --from=builder /app/target/gs-0-talent-platform-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8081
+
+COPY --from=build /app/target/*.jar app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
