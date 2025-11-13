@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "feature/**"
+      - "release"
+      - "hotfix"
+
+jobs:
+  build-test-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Build and test with Maven
+        run: ./mvnw -B clean test
+
+      - name: Build Docker image (check only)
+        run: docker build -t gs-0-talent-platform-ci:latest .
