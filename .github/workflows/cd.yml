@@ -3,7 +3,10 @@ name: CD - Continuous Delivery
 on:
   push:
     branches:
-      - main        
+      - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -21,8 +24,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build e Push para o Docker Hub
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile
           push: true
-          tags: heitornovaes/gs-0-talent-platform:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/gs-0-talent-platform:latest
